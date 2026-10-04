@@ -1,0 +1,150 @@
+/* Everything Overdo bolts onto the stock TodoMVC stylesheet. It reuses TodoMVC's palette (#4d4d4d text,
+   #b83f45 accent, hairline greys) so the additions look like they belong, if a little too eagerly. */
+
+.todo-list li .view {
+  position: relative;
+}
+
+.task-meta {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  width: 100%;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #949494;
+}
+
+.task-meta .priority {
+  font-weight: 600;
+}
+
+.task-meta .p1 {
+  color: #b83f45;
+}
+
+.task-meta .p2 {
+  color: #c47b2b;
+}
+
+.task-meta .overdue {
+  color: #b83f45;
+  font-weight: 600;
+}
+
+.todo-list li .expand {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 52px;
+  width: 32px;
+  margin: auto 0;
+  font-size: 16px;
+  color: #949494;
+}
+
+.todo-list li:hover .expand,
+.todo-list li.expanded .expand {
+  display: block;
+}
+
+.todo-list li .expand:hover {
+  color: #4d4d4d;
+}
+
+.task-details {
+  display: grid;
+  gap: 12px;
+  padding: 4px 16px 16px 60px;
+  font-size: 14px;
+  color: #4d4d4d;
+}
+
+.detail-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.todo-list li .task-details label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  line-height: inherit;
+  color: #949494;
+  text-decoration: none;
+  transition: none;
+}
+
+.task-details select,
+.task-details input,
+.task-details textarea {
+  font: inherit;
+  color: #4d4d4d;
+  border: 1px solid #e6e6e6;
+  border-radius: 3px;
+  background: #fff;
+  padding: 4px 6px;
+}
+
+.task-notes {
+  min-height: 56px;
+  resize: vertical;
+}
+
+.task-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 4px 1px 8px;
+  border: 1px solid;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.tag button,
+.subtasks button {
+  color: inherit;
+  font-size: 14px;
+  opacity: 0.6;
+}
+
+.tag button:hover,
+.subtasks button:hover {
+  opacity: 1;
+}
+
+.subtasks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.todo-list li .subtasks li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: inherit;
+  border-bottom: none;
+}
+
+.todo-list li .subtasks label {
+  gap: 8px;
+  color: #4d4d4d;
+}
+
+.todo-list li .subtasks li.done label {
+  color: #949494;
+  text-decoration: line-through;
+}

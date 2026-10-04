@@ -3,6 +3,18 @@
 export type Status = "todo" | "doing" | "done";
 export type Energy = "low" | "medium" | "high" | "chaotic";
 
+export interface Subtask {
+  id: string;
+  title: string;
+  done: boolean;
+}
+
+export interface Tag {
+  id: string;
+  name: string;
+  color: string;
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -13,4 +25,6 @@ export interface Task {
   dueOn: string | null;
   createdAt: string;
   completedAt: string | null;
+  subtasks: Subtask[];
+  tags: Tag[];
 }

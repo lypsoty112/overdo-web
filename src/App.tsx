@@ -1,6 +1,6 @@
 // Overdo's root: the TodoMVC app (add, toggle, toggle all, edit, delete, filter, clear completed) wired to
 // overdo-api. Tasks are held exactly as the API returned them; every update swaps in the row it sends back.
-import { type FormEvent, useEffect, useState } from "react";
+import { type FormEvent, useCallback, useEffect, useState } from "react";
 import * as api from "./api";
 import { TaskItem } from "./components/TaskItem";
 import type { Task } from "./types";
@@ -17,9 +17,11 @@ export function App() {
   const [draft, setDraft] = useState("");
   const filter = useHashFilter();
 
+  const reload = useCallback(() => api.listTasks().then(setTasks), []);
+
   useEffect(() => {
-    api.listTasks().then(setTasks);
-  }, []);
+    reload();
+  }, [reload]);
 
   const update = async (id: string, patch: api.TaskPatch) => {
     const updated = await api.updateTask(id, patch);
@@ -87,6 +89,7 @@ export function App() {
                   task={task}
                   onUpdate={(patch) => update(task.id, patch)}
                   onDelete={() => remove(task.id)}
+                  onChanged={reload}
                 />
               ))}
             </ul>
