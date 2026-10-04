@@ -1,10 +1,12 @@
 // One row of the TodoMVC list: a completion checkbox, a title that becomes an input on double-click, a
-// TaskMeta line (priority, energy, due date, subtask progress, tags), a 🍅 button that starts a focus
-// session, a button that unfolds TaskDetails and a destroy button. A title saves only on blur: Enter blurs, Escape restores the old title and then
-// blurs, and an emptied title deletes the task, as the TodoMVC spec asks.
+// TaskMeta line (boss bar for P1 tasks, priority, energy, due date, subtask progress, tags), a 🍅 button
+// that starts a focus session, a button that unfolds TaskDetails and a destroy button. A title saves
+// only on blur: Enter blurs, Escape restores the old title and then blurs, and an emptied title deletes
+// the task, as the TodoMVC spec asks.
 import { useState } from "react";
 import type { TaskPatch } from "../api";
 import type { Task } from "../types";
+import { BossBar } from "./BossBar";
 import { ENERGY_ICONS, TaskDetails } from "./TaskDetails";
 
 interface Props {
@@ -22,6 +24,7 @@ export function TaskMeta({ task }: { task: Task }) {
 
   return (
     <span className="task-meta">
+      {task.boss && <BossBar boss={task.boss} />}
       <span className={`priority p${task.priority}`}>P{task.priority}</span>
       <span>
         {ENERGY_ICONS[task.energy]} {task.energy}

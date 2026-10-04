@@ -28,6 +28,8 @@ The dev server proxies `/api` to `overdo-api` on `http://localhost:3700`, so sta
   length stops itself and pays XP.
 - `#/board` swaps the list for a kanban board; dragging a card into Done completes it.
 - A daily task horoscope sits under the list. It is the same for everyone until midnight UTC.
+- Every P1 task is a boss with a name, a bounty and an HP bar that drains as its subtasks are ticked.
+  Completing it lands the final blow: a victory banner, extra confetti, and the bounty in XP.
 
 ## Roadmap nobody asked for
 

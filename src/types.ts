@@ -16,6 +16,13 @@ export interface Tag {
   color: string;
 }
 
+export interface Boss {
+  name: string;
+  hp: number;
+  maxHp: number;
+  bounty: number;
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -28,6 +35,7 @@ export interface Task {
   completedAt: string | null;
   subtasks: Subtask[];
   tags: Tag[];
+  boss: Boss | null;
 }
 
 export interface Pomodoro {

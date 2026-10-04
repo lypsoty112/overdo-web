@@ -1,7 +1,8 @@
 // Overdo's root: the TodoMVC app (add, toggle, toggle all, edit, delete, filter, clear completed) wired to
 // overdo-api, plus everything bolted on around it: the stats bar, the kanban board behind #/board, the
-// horoscope, the running pomodoro and the mood check-in. Tasks are held exactly as the API returned them; every update swaps in the row it sends back.
-// A status change refreshes the stats, and completing a task fires confetti and asks how it felt.
+// horoscope, the running pomodoro, the mood check-in and the boss victory banner. Tasks are held exactly
+// as the API returned them; every update swaps in the row it sends back. A status change refreshes the
+// stats, and completing a task fires confetti, announces a fallen boss, and asks how it felt.
 import confetti from "canvas-confetti";
 import { type FormEvent, useCallback, useEffect, useState } from "react";
 import * as api from "./api";
@@ -11,7 +12,8 @@ import { MoodPrompt } from "./components/MoodPrompt";
 import { PomodoroWidget } from "./components/PomodoroWidget";
 import { StatsBar } from "./components/StatsBar";
 import { TaskItem } from "./components/TaskItem";
-import type { Pomodoro, Stats, Task } from "./types";
+import { VictoryBanner } from "./components/VictoryBanner";
+import type { Boss, Pomodoro, Stats, Task } from "./types";
 import { type Filter, useHashFilter } from "./useHashFilter";
 
 const FILTERS: { filter: Filter; href: string; label: string }[] = [
@@ -27,10 +29,12 @@ export function App() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [pomodoro, setPomodoro] = useState<Pomodoro | null>(null);
   const [moodFor, setMoodFor] = useState<Task | null>(null);
+  const [fallenBoss, setFallenBoss] = useState<Boss | null>(null);
   const filter = useHashFilter();
 
   const reload = useCallback(() => api.listTasks().then(setTasks), []);
   const refreshStats = useCallback(() => api.getStats().then(setStats), []);
+  const clearFallenBoss = useCallback(() => setFallenBoss(null), []);
 
   useEffect(() => {
     reload();
@@ -46,6 +50,9 @@ export function App() {
       disableForReducedMotion: true,
     });
     setMoodFor(task);
+    if (!task.boss) return;
+    setFallenBoss(task.boss);
+    confetti({ particleCount: 200, spread: 160, startVelocity: 55, disableForReducedMotion: true });
   };
 
   const update = async (id: string, patch: api.TaskPatch) => {
@@ -104,6 +111,7 @@ export function App() {
   return (
     <>
       {stats && <StatsBar stats={stats} />}
+      {fallenBoss && <VictoryBanner boss={fallenBoss} onDone={clearFallenBoss} />}
       <section className="todoapp">
         <header className="header">
           <h1>overdo</h1>

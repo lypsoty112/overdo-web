@@ -345,6 +345,68 @@ body {
   color: #949494;
 }
 
+.boss {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  width: 100%;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #b83f45;
+}
+
+.boss.defeated {
+  color: #949494;
+}
+
+.boss-hp {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 400;
+}
+
+.hp-track {
+  width: 120px;
+  height: 6px;
+  border-radius: 3px;
+  background: #ededed;
+  overflow: hidden;
+}
+
+.hp-fill {
+  display: block;
+  height: 100%;
+  background: #b83f45;
+  transition: width 0.4s ease;
+}
+
+.victory {
+  position: fixed;
+  top: 52px;
+  left: 50%;
+  z-index: 20;
+  transform: translateX(-50%);
+  max-width: calc(100vw - 32px);
+  padding: 12px 24px;
+  background: #b83f45;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  animation: victory-in 0.3s ease-out;
+}
+
+@keyframes victory-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -12px);
+  }
+}
+
 @media (max-width: 640px) {
   .board {
     grid-template-columns: 1fr;
