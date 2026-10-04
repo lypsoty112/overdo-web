@@ -1,6 +1,6 @@
 // One row of the TodoMVC list: a completion checkbox, a title that becomes an input on double-click, a
-// TaskMeta line (priority, energy, due date, subtask progress, tags), a button that unfolds TaskDetails
-// and a destroy button. A title saves only on blur: Enter blurs, Escape restores the old title and then
+// TaskMeta line (priority, energy, due date, subtask progress, tags), a 🍅 button that starts a focus
+// session, a button that unfolds TaskDetails and a destroy button. A title saves only on blur: Enter blurs, Escape restores the old title and then
 // blurs, and an emptied title deletes the task, as the TodoMVC spec asks.
 import { useState } from "react";
 import type { TaskPatch } from "../api";
@@ -12,6 +12,7 @@ interface Props {
   onUpdate: (patch: TaskPatch) => void;
   onDelete: () => void;
   onChanged: () => void;
+  onStartFocus: () => void;
 }
 
 function TaskMeta({ task }: { task: Task }) {
@@ -40,7 +41,7 @@ function TaskMeta({ task }: { task: Task }) {
   );
 }
 
-export function TaskItem({ task, onUpdate, onDelete, onChanged }: Props) {
+export function TaskItem({ task, onUpdate, onDelete, onChanged, onStartFocus }: Props) {
   const [editing, setEditing] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const done = task.status === "done";
@@ -67,6 +68,16 @@ export function TaskItem({ task, onUpdate, onDelete, onChanged }: Props) {
           {task.title}
           <TaskMeta task={task} />
         </label>
+        {!done && (
+          <button
+            type="button"
+            className="focus"
+            aria-label="Start a 25-minute focus session"
+            onClick={onStartFocus}
+          >
+            🍅
+          </button>
+        )}
         <button
           type="button"
           className="expand"

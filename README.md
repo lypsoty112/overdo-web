@@ -21,6 +21,11 @@ The dev server proxies `/api` to `overdo-api` on `http://localhost:3700`, so sta
   subtask progress and tags.
 - ▾ unfolds a details panel: priority, energy and due date pickers, notes, tag chips with
   autocomplete, and a subtask checklist.
+- A stats bar pinned to the top: level and XP, streak, today's completions and focus minutes, mood of
+  the day, and a procrastination index that turns red past 50%.
+- Completing a task fires confetti (more for higher priority) and asks how it felt.
+- 🍅 on a row starts a 25-minute focus session with a floating countdown; a session that runs its full
+  length stops itself and pays XP.
 
 ## Credits
 

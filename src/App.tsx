@@ -1,9 +1,15 @@
 // Overdo's root: the TodoMVC app (add, toggle, toggle all, edit, delete, filter, clear completed) wired to
-// overdo-api. Tasks are held exactly as the API returned them; every update swaps in the row it sends back.
+// overdo-api, plus everything bolted on around it: the stats bar, the running pomodoro and the mood
+// check-in. Tasks are held exactly as the API returned them; every update swaps in the row it sends back.
+// A status change refreshes the stats, and completing a task fires confetti and asks how it felt.
+import confetti from "canvas-confetti";
 import { type FormEvent, useCallback, useEffect, useState } from "react";
 import * as api from "./api";
+import { MoodPrompt } from "./components/MoodPrompt";
+import { PomodoroWidget } from "./components/PomodoroWidget";
+import { StatsBar } from "./components/StatsBar";
 import { TaskItem } from "./components/TaskItem";
-import type { Task } from "./types";
+import type { Pomodoro, Stats, Task } from "./types";
 import { type Filter, useHashFilter } from "./useHashFilter";
 
 const FILTERS: { filter: Filter; href: string; label: string }[] = [
@@ -15,18 +21,52 @@ const FILTERS: { filter: Filter; href: string; label: string }[] = [
 export function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [draft, setDraft] = useState("");
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [pomodoro, setPomodoro] = useState<Pomodoro | null>(null);
+  const [moodFor, setMoodFor] = useState<Task | null>(null);
   const filter = useHashFilter();
 
   const reload = useCallback(() => api.listTasks().then(setTasks), []);
+  const refreshStats = useCallback(() => api.getStats().then(setStats), []);
 
   useEffect(() => {
     reload();
-  }, [reload]);
+    refreshStats();
+    api.currentPomodoro().then(setPomodoro);
+  }, [reload, refreshStats]);
+
+  const celebrate = (task: Task) => {
+    confetti({
+      particleCount: 60 + (4 - task.priority) * 40,
+      spread: 80,
+      origin: { y: 0.35 },
+      disableForReducedMotion: true,
+    });
+    setMoodFor(task);
+  };
 
   const update = async (id: string, patch: api.TaskPatch) => {
+    const wasDone = tasks.find((task) => task.id === id)?.status === "done";
     const updated = await api.updateTask(id, patch);
     setTasks((current) => current.map((task) => (task.id === id ? updated : task)));
+    if (patch.status === undefined) return;
+    refreshStats();
+    if (updated.status === "done" && !wasDone) celebrate(updated);
   };
+
+  const startFocus = async (task: Task) => {
+    setPomodoro(await api.startPomodoro(task.id));
+    reload();
+  };
+
+  const stopFocus = useCallback(async () => {
+    if (!pomodoro) return;
+    const stopped = await api.stopPomodoro(pomodoro.id);
+    setPomodoro(null);
+    refreshStats();
+    if (!stopped.finished) return;
+    confetti({ particleCount: 40, origin: { x: 0.9, y: 0.9 }, disableForReducedMotion: true });
+  }, [pomodoro, refreshStats]);
 
   const remove = async (id: string) => {
     await api.deleteTask(id);
@@ -60,6 +100,7 @@ export function App() {
 
   return (
     <>
+      {stats && <StatsBar stats={stats} />}
       <section className="todoapp">
         <header className="header">
           <h1>overdo</h1>
@@ -90,6 +131,7 @@ export function App() {
                   onUpdate={(patch) => update(task.id, patch)}
                   onDelete={() => remove(task.id)}
                   onChanged={reload}
+                  onStartFocus={() => startFocus(task)}
                 />
               ))}
             </ul>
@@ -121,6 +163,22 @@ export function App() {
         <p>Double-click to edit a task</p>
         <p>Overdo: a to-do list that does far too much</p>
       </footer>
+      {pomodoro && (
+        <PomodoroWidget
+          session={pomodoro}
+          taskTitle={tasks.find((task) => task.id === pomodoro.taskId)?.title ?? "a task"}
+          onStop={stopFocus}
+        />
+      )}
+      {moodFor && (
+        <MoodPrompt
+          task={moodFor}
+          onDone={() => {
+            setMoodFor(null);
+            refreshStats();
+          }}
+        />
+      )}
     </>
   );
 }

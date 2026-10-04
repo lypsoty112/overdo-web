@@ -1,6 +1,6 @@
 // The typed client for overdo-api. Vite proxies /api to the API, so every call is same-origin. request
 // throws on any non-2xx response, carrying the API's own error message when it sent one.
-import type { Subtask, Tag, Task } from "./types";
+import type { Mood, Pomodoro, Stats, Subtask, Tag, Task } from "./types";
 
 export type TaskPatch = Partial<Pick<Task, "title" | "notes" | "status" | "priority" | "energy" | "dueOn">>;
 
@@ -33,3 +33,10 @@ export const addTag = (taskId: string, name: string) =>
   request<Tag>("POST", `/tasks/${taskId}/tags`, { name });
 export const removeTag = (taskId: string, tagId: string) =>
   request<void>("DELETE", `/tasks/${taskId}/tags/${tagId}`);
+
+export const startPomodoro = (taskId: string) => request<Pomodoro>("POST", `/tasks/${taskId}/pomodoros`, {});
+export const currentPomodoro = () => request<Pomodoro | null>("GET", "/pomodoros/current");
+export const stopPomodoro = (id: string) => request<Pomodoro>("POST", `/pomodoros/${id}/stop`);
+
+export const logMood = (mood: Mood, taskId: string) => request<void>("POST", "/moods", { mood, taskId });
+export const getStats = () => request<Stats>("GET", "/stats");
