@@ -4,6 +4,8 @@
 // as the API returned them; every update swaps in the row it sends back. A status change refreshes the
 // stats, and completing a task fires confetti, announces a fallen boss, and asks how it felt. The tab
 // title counts what is left, and an empty list (once loaded, so it never flashes) offers starter tasks.
+// Deletes leave the list at once but reach the API only when their undo toast expires; a second delete
+// sends the first one immediately rather than stacking toasts.
 import confetti from "canvas-confetti";
 import { type FormEvent, useCallback, useEffect, useState } from "react";
 import * as api from "./api";
@@ -13,6 +15,7 @@ import { MoodPrompt } from "./components/MoodPrompt";
 import { PomodoroWidget } from "./components/PomodoroWidget";
 import { StatsBar } from "./components/StatsBar";
 import { TaskItem } from "./components/TaskItem";
+import { UndoToast } from "./components/UndoToast";
 import { VictoryBanner } from "./components/VictoryBanner";
 import type { Boss, Pomodoro, Stats, Task } from "./types";
 import { type Filter, useHashFilter } from "./useHashFilter";
@@ -34,6 +37,7 @@ export function App() {
   const [pomodoro, setPomodoro] = useState<Pomodoro | null>(null);
   const [moodFor, setMoodFor] = useState<Task | null>(null);
   const [fallenBoss, setFallenBoss] = useState<Boss | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Task[] | null>(null);
   const filter = useHashFilter();
 
   const reload = useCallback(
@@ -89,9 +93,22 @@ export function App() {
     confetti({ particleCount: 40, origin: { x: 0.9, y: 0.9 }, disableForReducedMotion: true });
   }, [pomodoro, refreshStats]);
 
-  const remove = async (id: string) => {
-    await api.deleteTask(id);
-    setTasks((current) => current.filter((task) => task.id !== id));
+  const commitDelete = useCallback(() => {
+    for (const task of pendingDelete ?? []) api.deleteTask(task.id);
+    setPendingDelete(null);
+  }, [pendingDelete]);
+
+  const remove = (removing: Task[]) => {
+    commitDelete();
+    const ids = new Set(removing.map((task) => task.id));
+    setTasks((current) => current.filter((task) => !ids.has(task.id)));
+    setPendingDelete(removing);
+  };
+
+  const undoDelete = () => {
+    const restoring = pendingDelete ?? [];
+    setTasks((current) => [...current, ...restoring].sort((a, b) => a.createdAt.localeCompare(b.createdAt)));
+    setPendingDelete(null);
   };
 
   const create = async (title: string) => {
@@ -123,9 +140,7 @@ export function App() {
     for (const task of flipping) update(task.id, { status });
   };
 
-  const clearCompleted = () => {
-    for (const task of completed) remove(task.id);
-  };
+  const clearCompleted = () => remove(completed);
 
   return (
     <>
@@ -175,7 +190,7 @@ export function App() {
                   key={task.id}
                   task={task}
                   onUpdate={(patch) => update(task.id, patch)}
-                  onDelete={() => remove(task.id)}
+                  onDelete={() => remove([task])}
                   onChanged={reload}
                   onStartFocus={() => startFocus(task)}
                 />
@@ -217,6 +232,7 @@ export function App() {
           onStop={stopFocus}
         />
       )}
+      {pendingDelete && <UndoToast tasks={pendingDelete} onUndo={undoDelete} onExpire={commitDelete} />}
       {moodFor && (
         <MoodPrompt
           task={moodFor}
