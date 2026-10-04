@@ -1,10 +1,16 @@
 <!doctype html>
-<!-- Overdo's only page. Vite injects src/main.tsx, which mounts the React app into #root. -->
+<!-- Overdo's only page. Vite injects src/main.tsx, which mounts the React app into #root. The inline
+     script sets data-theme before any stylesheet applies, so a dark page never flashes light. -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Overdo</title>
+    <script>
+      document.documentElement.dataset.theme =
+        localStorage.getItem("overdo:theme") ??
+        (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -1,5 +1,101 @@
-/* Everything Overdo bolts onto the stock TodoMVC stylesheet. It reuses TodoMVC's palette (#4d4d4d text,
-   #b83f45 accent, hairline greys) so the additions look like they belong, if a little too eagerly. */
+/* Everything Overdo bolts onto the stock TodoMVC stylesheet. Colours are theme variables: :root holds
+   TodoMVC's own palette (#4d4d4d text, #b83f45 accent, hairline greys) and [data-theme="dark"] swaps
+   it. TodoMVC hardcodes its colours, so the rules right below the variables repeat its selectors and
+   point them at the same variables; in light mode they resolve to exactly what TodoMVC already set. */
+
+:root {
+  color-scheme: light;
+  --bg: #f5f5f5;
+  --surface: #fff;
+  --surface-muted: #fafafa;
+  --hover: #f5f5f5;
+  --text: #4d4d4d;
+  --text-strong: #484848;
+  --body-text: #111;
+  --muted: #949494;
+  --border: #e6e6e6;
+  --hairline: #ededed;
+  --accent: #b83f45;
+  --placeholder: rgba(0, 0, 0, 0.4);
+  --paper-edge: #f6f6f6;
+  --info-shadow: rgba(255, 255, 255, 0.5);
+  --toast-bg: #4d4d4d;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #141414;
+  --surface: #1f1f1f;
+  --surface-muted: #191919;
+  --hover: #2a2a2a;
+  --text: #d0d0d0;
+  --text-strong: #e4e4e4;
+  --body-text: #e4e4e4;
+  --muted: #8c8c8c;
+  --border: #333;
+  --hairline: #2b2b2b;
+  --accent: #e0646b;
+  --placeholder: rgba(255, 255, 255, 0.35);
+  --paper-edge: #1a1a1a;
+  --info-shadow: transparent;
+  --toast-bg: #333;
+}
+
+body {
+  background: var(--bg);
+  color: var(--body-text);
+}
+
+.todoapp {
+  background: var(--surface);
+}
+
+.todoapp input::placeholder {
+  color: var(--placeholder);
+}
+
+.todoapp h1 {
+  color: var(--accent);
+}
+
+.main,
+.footer {
+  border-top-color: var(--border);
+}
+
+.todo-list li {
+  border-bottom-color: var(--hairline);
+}
+
+.toggle-all + label:before {
+  color: var(--muted);
+}
+
+.toggle-all:checked + label:before {
+  color: var(--text-strong);
+}
+
+.todo-list li label {
+  color: var(--text-strong);
+}
+
+.todo-list li.completed label {
+  color: var(--muted);
+}
+
+.footer:before {
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.2),
+    0 8px 0 -3px var(--paper-edge),
+    0 9px 1px -3px rgba(0, 0, 0, 0.2),
+    0 16px 0 -6px var(--paper-edge),
+    0 17px 2px -6px rgba(0, 0, 0, 0.2);
+}
+
+.info {
+  color: var(--muted);
+  text-shadow: 0 1px 0 var(--info-shadow);
+}
 
 .todo-list li .view {
   position: relative;
@@ -12,7 +108,7 @@
   width: 100%;
   margin-top: 4px;
   font-size: 12px;
-  color: #949494;
+  color: var(--muted);
 }
 
 .task-meta .priority {
@@ -20,7 +116,7 @@
 }
 
 .task-meta .p1 {
-  color: #b83f45;
+  color: var(--accent);
 }
 
 .task-meta .p2 {
@@ -28,7 +124,7 @@
 }
 
 .task-meta .overdue {
-  color: #b83f45;
+  color: var(--accent);
   font-weight: 600;
 }
 
@@ -42,7 +138,7 @@
   width: 32px;
   margin: auto 0;
   font-size: 16px;
-  color: #949494;
+  color: var(--muted);
 }
 
 .todo-list li .focus {
@@ -56,7 +152,7 @@
 }
 
 .todo-list li .expand:hover {
-  color: #4d4d4d;
+  color: var(--text);
 }
 
 .task-details {
@@ -64,7 +160,7 @@
   gap: 12px;
   padding: 4px 16px 16px 60px;
   font-size: 14px;
-  color: #4d4d4d;
+  color: var(--text);
 }
 
 .detail-row {
@@ -79,7 +175,7 @@
   gap: 6px;
   padding: 0;
   line-height: inherit;
-  color: #949494;
+  color: var(--muted);
   text-decoration: none;
   transition: none;
 }
@@ -88,10 +184,10 @@
 .task-details input,
 .task-details textarea {
   font: inherit;
-  color: #4d4d4d;
-  border: 1px solid #e6e6e6;
+  color: var(--text);
+  border: 1px solid var(--border);
   border-radius: 3px;
-  background: #fff;
+  background: var(--surface);
   padding: 4px 6px;
 }
 
@@ -147,11 +243,11 @@
 
 .todo-list li .subtasks label {
   gap: 8px;
-  color: #4d4d4d;
+  color: var(--text);
 }
 
 .todo-list li .subtasks li.done label {
-  color: #949494;
+  color: var(--muted);
   text-decoration: line-through;
 }
 
@@ -171,46 +267,50 @@ body {
   justify-content: center;
   gap: 6px 16px;
   padding: 8px 16px;
-  background: #fff;
-  border-bottom: 1px solid #ededed;
+  background: var(--surface);
+  border-bottom: 1px solid var(--hairline);
   font-size: 13px;
-  color: #4d4d4d;
+  color: var(--text);
 }
 
 .stats-bar .level {
   font-weight: 600;
-  color: #b83f45;
+  color: var(--accent);
 }
 
 .xp-track {
   width: 120px;
   height: 6px;
   border-radius: 3px;
-  background: #ededed;
+  background: var(--hairline);
   overflow: hidden;
 }
 
 .xp-fill {
   display: block;
   height: 100%;
-  background: #b83f45;
+  background: var(--accent);
   transition: width 0.6s ease;
 }
 
 .stats-bar .procrastinating {
-  color: #b83f45;
+  color: var(--accent);
   font-weight: 600;
+}
+
+.stats-bar .theme-toggle {
+  font-size: 15px;
 }
 
 .pomodoro,
 .mood-prompt {
   position: fixed;
   z-index: 10;
-  background: #fff;
-  border: 1px solid #e6e6e6;
+  background: var(--surface);
+  border: 1px solid var(--border);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
   font-size: 14px;
-  color: #4d4d4d;
+  color: var(--text);
 }
 
 .pomodoro {
@@ -237,7 +337,7 @@ body {
 
 .pomodoro button {
   padding: 4px 10px;
-  border: 1px solid #e6e6e6;
+  border: 1px solid var(--border);
   border-radius: 3px;
 }
 
@@ -264,14 +364,14 @@ body {
 }
 
 .mood-prompt div button:hover {
-  background: #f5f5f5;
+  background: var(--hover);
 }
 
 .mood-prompt .dismiss {
   position: absolute;
   top: 6px;
   right: 10px;
-  color: #949494;
+  color: var(--muted);
 }
 
 .board {
@@ -283,14 +383,14 @@ body {
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
   padding: 16px 0;
-  border-top: 1px solid #e6e6e6;
+  border-top: 1px solid var(--border);
 }
 
 .board-column {
   min-height: 160px;
   padding: 10px;
-  background: #fafafa;
-  border: 1px solid #ededed;
+  background: var(--surface-muted);
+  border: 1px solid var(--hairline);
 }
 
 .board-column h2 {
@@ -299,27 +399,27 @@ body {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #949494;
+  color: var(--muted);
 }
 
 .board-card {
   margin-bottom: 8px;
   padding: 10px 12px;
-  background: #fff;
-  border: 1px solid #e6e6e6;
+  background: var(--surface);
+  border: 1px solid var(--border);
   font-size: 16px;
-  color: #4d4d4d;
+  color: var(--text);
   cursor: grab;
 }
 
 .horoscope {
   margin: -16px 0 40px;
   padding: 16px 20px;
-  background: #fff;
-  border-left: 3px solid #b83f45;
+  background: var(--surface);
+  border-left: 3px solid var(--accent);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
   font-size: 14px;
-  color: #4d4d4d;
+  color: var(--text);
 }
 
 .horoscope h2 {
@@ -328,7 +428,7 @@ body {
   font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #949494;
+  color: var(--muted);
 }
 
 .horoscope p {
@@ -337,12 +437,12 @@ body {
 
 .horoscope .sign {
   font-size: 18px;
-  color: #b83f45;
+  color: var(--accent);
 }
 
 .horoscope .fine-print {
   font-size: 12px;
-  color: #949494;
+  color: var(--muted);
 }
 
 .boss {
@@ -353,11 +453,11 @@ body {
   width: 100%;
   font-weight: 600;
   letter-spacing: 0.04em;
-  color: #b83f45;
+  color: var(--accent);
 }
 
 .boss.defeated {
-  color: #949494;
+  color: var(--muted);
 }
 
 .boss-hp {
@@ -371,14 +471,14 @@ body {
   width: 120px;
   height: 6px;
   border-radius: 3px;
-  background: #ededed;
+  background: var(--hairline);
   overflow: hidden;
 }
 
 .hp-fill {
   display: block;
   height: 100%;
-  background: #b83f45;
+  background: var(--accent);
   transition: width 0.4s ease;
 }
 
@@ -390,7 +490,7 @@ body {
   transform: translateX(-50%);
   max-width: calc(100vw - 32px);
   padding: 12px 24px;
-  background: #b83f45;
+  background: var(--accent);
   color: #fff;
   font-size: 20px;
   font-weight: 600;
@@ -409,10 +509,10 @@ body {
 
 .empty-state {
   padding: 24px 24px 28px;
-  border-top: 1px solid #e6e6e6;
+  border-top: 1px solid var(--border);
   text-align: center;
   font-size: 18px;
-  color: #4d4d4d;
+  color: var(--text);
 }
 
 .empty-state p {
@@ -422,7 +522,7 @@ body {
 .empty-state .empty-hint {
   margin-bottom: 14px;
   font-size: 14px;
-  color: #949494;
+  color: var(--muted);
 }
 
 .empty-state div {
@@ -434,15 +534,15 @@ body {
 
 .empty-state div button {
   padding: 6px 12px;
-  border: 1px solid #e6e6e6;
+  border: 1px solid var(--border);
   border-radius: 14px;
   font-size: 14px;
-  color: #4d4d4d;
+  color: var(--text);
 }
 
 .empty-state div button:hover {
-  border-color: #b83f45;
-  color: #b83f45;
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .undo-toast {
@@ -456,7 +556,7 @@ body {
   gap: 16px;
   max-width: calc(100vw - 32px);
   padding: 10px 16px;
-  background: #4d4d4d;
+  background: var(--toast-bg);
   color: #fff;
   font-size: 14px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
@@ -474,7 +574,7 @@ body {
 }
 
 .todo-list li.selected {
-  box-shadow: inset 3px 0 0 #b83f45;
+  box-shadow: inset 3px 0 0 var(--accent);
 }
 
 .shortcut-help {
@@ -485,11 +585,11 @@ body {
   transform: translate(-50%, -50%);
   width: min(380px, calc(100vw - 32px));
   padding: 20px 24px;
-  background: #fff;
-  border: 1px solid #e6e6e6;
+  background: var(--surface);
+  border: 1px solid var(--border);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
   font-size: 14px;
-  color: #4d4d4d;
+  color: var(--text);
 }
 
 .shortcut-help h2 {
@@ -515,7 +615,7 @@ body {
 
 .shortcut-help kbd {
   padding: 1px 6px;
-  border: 1px solid #e6e6e6;
+  border: 1px solid var(--border);
   border-bottom-width: 2px;
   border-radius: 3px;
   font-family: inherit;

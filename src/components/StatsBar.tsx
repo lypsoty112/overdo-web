@@ -1,9 +1,12 @@
 // The strip pinned to the top of the page: level and XP progress, streak, today's completions and focus
-// minutes, the mood of the day and the procrastination index. It only renders what App hands it.
+// minutes, the mood of the day, the procrastination index, and the light/dark toggle. The stats are
+// whatever App hands it; the theme is global, so the toggle drives useTheme directly.
 import type { Stats } from "../types";
+import { useTheme } from "../useTheme";
 import { MOOD_EMOJI } from "./MoodPrompt";
 
 export function StatsBar({ stats }: { stats: Stats }) {
+  const [theme, toggleTheme] = useTheme();
   const progress = Math.round((stats.xpIntoLevel / stats.xpForNextLevel) * 100);
 
   return (
@@ -30,6 +33,14 @@ export function StatsBar({ stats }: { stats: Stats }) {
       <span className={stats.procrastinationIndex >= 50 ? "procrastinating" : undefined}>
         Procrastination {stats.procrastinationIndex}%
       </span>
+      <button
+        type="button"
+        className="theme-toggle"
+        aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+        onClick={toggleTheme}
+      >
+        {theme === "dark" ? "☀️" : "🌙"}
+      </button>
     </header>
   );
 }

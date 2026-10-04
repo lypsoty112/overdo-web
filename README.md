@@ -23,6 +23,7 @@ The dev server proxies `/api` to `overdo-api` on `http://localhost:3700`, so sta
 - Deleting (or clearing completed) can be undone for five seconds before it reaches the API.
 - Keyboard shortcuts: `n` new task, `j`/`k` select, `x` complete, `e` edit, `Delete` remove, `?` for
   the full list.
+- Dark mode follows the OS until you flip the 🌙/☀️ toggle in the stats bar, which is remembered.
 - ▾ unfolds a details panel: priority, energy and due date pickers, notes, tag chips with
   autocomplete, and a subtask checklist.
 - A stats bar pinned to the top: level and XP, streak, today's completions and focus minutes, mood of
