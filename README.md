@@ -29,6 +29,20 @@ The dev server proxies `/api` to `overdo-api` on `http://localhost:3700`, so sta
 - `#/board` swaps the list for a kanban board; dragging a card into Done completes it.
 - A daily task horoscope sits under the list. It is the same for everyone until midnight UTC.
 
+## Roadmap nobody asked for
+
+| Feature | Touches |
+| --- | --- |
+| "Blocked by" dependencies between tasks | db, api, web |
+| Recurring tasks | db, api, web |
+| Achievements ("Finished a P1 before noon") | db, api, web |
+| Undo for deleted tasks (they are only soft-deleted anyway) | api, web |
+| Weekly procrastination report | api, web |
+| Export to `.ics` | api |
+| Sound effects on completion | web |
+| Dark mode | web |
+| Keyboard shortcuts | web |
+
 ## Credits
 
 Base styles are [todomvc-app-css](https://github.com/tastejs/todomvc-app-css) by Sindre Sorhus,
