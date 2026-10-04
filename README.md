@@ -17,8 +17,9 @@ The dev server proxies `/api` to `overdo-api` on `http://localhost:3700`, so sta
 
 - Everything TodoMVC does: add, toggle, toggle all, double-click to edit, delete, filter
   (`#/active`, `#/completed`), clear completed.
-- Every row shows its priority (P1–P4), energy (🐢 low to 🌪️ chaotic), due date (red once overdue),
-  subtask progress and tags.
+- Every row shows its priority (P1–P4), energy (🐢 low to 🌪️ chaotic), a relative due date ("due
+  tomorrow", "3 days overdue" in red), subtask progress and tags.
+- The tab title counts open tasks, and an empty list offers a few starter tasks.
 - ▾ unfolds a details panel: priority, energy and due date pickers, notes, tag chips with
   autocomplete, and a subtask checklist.
 - A stats bar pinned to the top: level and XP, streak, today's completions and focus minutes, mood of

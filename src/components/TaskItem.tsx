@@ -2,7 +2,8 @@
 // TaskMeta line (boss bar for P1 tasks, priority, energy, due date, subtask progress, tags), a 🍅 button
 // that starts a focus session, a button that unfolds TaskDetails and a destroy button. A title saves
 // only on blur: Enter blurs, Escape restores the old title and then blurs, and an emptied title deletes
-// the task, as the TodoMVC spec asks.
+// the task, as the TodoMVC spec asks. describeDue turns a due date into "due tomorrow" or "3 days
+// overdue", counted from the viewer's local date rather than UTC so "today" flips at their midnight.
 import { useState } from "react";
 import type { TaskPatch } from "../api";
 import type { Task } from "../types";
@@ -17,9 +18,31 @@ interface Props {
   onStartFocus: () => void;
 }
 
+const DAY_MS = 86_400_000;
+
+function localToday(): string {
+  const now = new Date();
+  return [now.getFullYear(), now.getMonth() + 1, now.getDate()]
+    .map((part) => String(part).padStart(2, "0"))
+    .join("-");
+}
+
+function plural(count: number, unit: string): string {
+  return `${count} ${unit}${count === 1 ? "" : "s"}`;
+}
+
+function describeDue(dueOn: string, today: string, done: boolean): string {
+  const days = Math.round((Date.parse(dueOn) - Date.parse(today)) / DAY_MS);
+  if (days === 0) return "due today";
+  if (days === 1) return "due tomorrow";
+  if (days > 1) return `due in ${plural(days, "day")}`;
+  return done ? `was due ${plural(-days, "day")} ago` : `${plural(-days, "day")} overdue`;
+}
+
 export function TaskMeta({ task }: { task: Task }) {
-  const today = new Date().toISOString().slice(0, 10);
-  const overdue = task.dueOn !== null && task.status !== "done" && task.dueOn < today;
+  const today = localToday();
+  const done = task.status === "done";
+  const overdue = task.dueOn !== null && !done && task.dueOn < today;
   const subtasksDone = task.subtasks.filter((subtask) => subtask.done).length;
 
   return (
@@ -29,7 +52,11 @@ export function TaskMeta({ task }: { task: Task }) {
       <span>
         {ENERGY_ICONS[task.energy]} {task.energy}
       </span>
-      {task.dueOn && <span className={overdue ? "overdue" : undefined}>due {task.dueOn}</span>}
+      {task.dueOn && (
+        <span className={overdue ? "overdue" : undefined} title={task.dueOn}>
+          {describeDue(task.dueOn, today, done)}
+        </span>
+      )}
       {task.subtasks.length > 0 && (
         <span>
           ☑ {subtasksDone}/{task.subtasks.length}

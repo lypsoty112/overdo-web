@@ -2,7 +2,8 @@
 // overdo-api, plus everything bolted on around it: the stats bar, the kanban board behind #/board, the
 // horoscope, the running pomodoro, the mood check-in and the boss victory banner. Tasks are held exactly
 // as the API returned them; every update swaps in the row it sends back. A status change refreshes the
-// stats, and completing a task fires confetti, announces a fallen boss, and asks how it felt.
+// stats, and completing a task fires confetti, announces a fallen boss, and asks how it felt. The tab
+// title counts what is left, and an empty list (once loaded, so it never flashes) offers starter tasks.
 import confetti from "canvas-confetti";
 import { type FormEvent, useCallback, useEffect, useState } from "react";
 import * as api from "./api";
@@ -23,8 +24,11 @@ const FILTERS: { filter: Filter; href: string; label: string }[] = [
   { filter: "board", href: "#/board", label: "Board" },
 ];
 
+const STARTER_TASKS = ["Alphabetise the spice rack", "Reply to all emails", "Learn the accordion"];
+
 export function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [loaded, setLoaded] = useState(false);
   const [draft, setDraft] = useState("");
   const [stats, setStats] = useState<Stats | null>(null);
   const [pomodoro, setPomodoro] = useState<Pomodoro | null>(null);
@@ -32,7 +36,14 @@ export function App() {
   const [fallenBoss, setFallenBoss] = useState<Boss | null>(null);
   const filter = useHashFilter();
 
-  const reload = useCallback(() => api.listTasks().then(setTasks), []);
+  const reload = useCallback(
+    () =>
+      api.listTasks().then((rows) => {
+        setTasks(rows);
+        setLoaded(true);
+      }),
+    [],
+  );
   const refreshStats = useCallback(() => api.getStats().then(setStats), []);
   const clearFallenBoss = useCallback(() => setFallenBoss(null), []);
 
@@ -83,17 +94,25 @@ export function App() {
     setTasks((current) => current.filter((task) => task.id !== id));
   };
 
-  const add = async (event: FormEvent) => {
-    event.preventDefault();
-    const title = draft.trim();
-    if (!title) return;
-    setDraft("");
+  const create = async (title: string) => {
     const created = await api.createTask(title);
     setTasks((current) => [...current, created]);
   };
 
+  const add = (event: FormEvent) => {
+    event.preventDefault();
+    const title = draft.trim();
+    if (!title) return;
+    setDraft("");
+    create(title);
+  };
+
   const completed = tasks.filter((task) => task.status === "done");
   const remaining = tasks.length - completed.length;
+
+  useEffect(() => {
+    document.title = remaining > 0 ? `(${remaining}) Overdo` : "Overdo";
+  }, [remaining]);
   const visible = tasks.filter(
     (task) => filter === "all" || (filter === "completed") === (task.status === "done"),
   );
@@ -124,6 +143,19 @@ export function App() {
             />
           </form>
         </header>
+        {loaded && tasks.length === 0 && (
+          <section className="empty-state">
+            <p>Nothing to overdo. Suspicious.</p>
+            <p className="empty-hint">Start with something you will never finish:</p>
+            <div>
+              {STARTER_TASKS.map((title) => (
+                <button key={title} type="button" onClick={() => create(title)}>
+                  {title}
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
         {tasks.length > 0 && filter === "board" && (
           <Board tasks={tasks} onMove={(task, status) => update(task.id, { status })} />
         )}
