@@ -1,12 +1,15 @@
 // The list filter lives in the URL hash (#/, #/active, #/completed), the way every TodoMVC keeps it, so a
-// filter survives a reload and the back button. useHashFilter re-renders its caller on every hashchange.
+// filter survives a reload and the back button. #/board rides along as a fourth "filter" that swaps the
+// list for the kanban board. useHashFilter re-renders its caller on every hashchange.
 import { useSyncExternalStore } from "react";
 
-export type Filter = "all" | "active" | "completed";
+const FILTERS = ["active", "completed", "board"] as const;
+
+export type Filter = "all" | (typeof FILTERS)[number];
 
 function readFilter(): Filter {
   const hash = window.location.hash.replace("#/", "");
-  return hash === "active" || hash === "completed" ? hash : "all";
+  return FILTERS.find((filter) => filter === hash) ?? "all";
 }
 
 function subscribe(onChange: () => void): () => void {

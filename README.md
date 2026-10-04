@@ -26,6 +26,8 @@ The dev server proxies `/api` to `overdo-api` on `http://localhost:3700`, so sta
 - Completing a task fires confetti (more for higher priority) and asks how it felt.
 - 🍅 on a row starts a 25-minute focus session with a floating countdown; a session that runs its full
   length stops itself and pays XP.
+- `#/board` swaps the list for a kanban board; dragging a card into Done completes it.
+- A daily task horoscope sits under the list. It is the same for everyone until midnight UTC.
 
 ## Credits
 

@@ -39,6 +39,14 @@ export interface Pomodoro {
   finished?: boolean;
 }
 
+export interface Horoscope {
+  date: string;
+  sign: string;
+  reading: string;
+  luckyPriority: number;
+  avoid: string;
+}
+
 export interface Stats {
   xp: number;
   level: number;

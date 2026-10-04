@@ -15,7 +15,7 @@ interface Props {
   onStartFocus: () => void;
 }
 
-function TaskMeta({ task }: { task: Task }) {
+export function TaskMeta({ task }: { task: Task }) {
   const today = new Date().toISOString().slice(0, 10);
   const overdue = task.dueOn !== null && task.status !== "done" && task.dueOn < today;
   const subtasksDone = task.subtasks.filter((subtask) => subtask.done).length;

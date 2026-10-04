@@ -1,10 +1,12 @@
 // Overdo's root: the TodoMVC app (add, toggle, toggle all, edit, delete, filter, clear completed) wired to
-// overdo-api, plus everything bolted on around it: the stats bar, the running pomodoro and the mood
-// check-in. Tasks are held exactly as the API returned them; every update swaps in the row it sends back.
+// overdo-api, plus everything bolted on around it: the stats bar, the kanban board behind #/board, the
+// horoscope, the running pomodoro and the mood check-in. Tasks are held exactly as the API returned them; every update swaps in the row it sends back.
 // A status change refreshes the stats, and completing a task fires confetti and asks how it felt.
 import confetti from "canvas-confetti";
 import { type FormEvent, useCallback, useEffect, useState } from "react";
 import * as api from "./api";
+import { Board } from "./components/Board";
+import { HoroscopeCard } from "./components/HoroscopeCard";
 import { MoodPrompt } from "./components/MoodPrompt";
 import { PomodoroWidget } from "./components/PomodoroWidget";
 import { StatsBar } from "./components/StatsBar";
@@ -16,6 +18,7 @@ const FILTERS: { filter: Filter; href: string; label: string }[] = [
   { filter: "all", href: "#/", label: "All" },
   { filter: "active", href: "#/active", label: "Active" },
   { filter: "completed", href: "#/completed", label: "Completed" },
+  { filter: "board", href: "#/board", label: "Board" },
 ];
 
 export function App() {
@@ -113,7 +116,10 @@ export function App() {
             />
           </form>
         </header>
-        {tasks.length > 0 && (
+        {tasks.length > 0 && filter === "board" && (
+          <Board tasks={tasks} onMove={(task, status) => update(task.id, { status })} />
+        )}
+        {tasks.length > 0 && filter !== "board" && (
           <section className="main">
             <input
               id="toggle-all"
@@ -159,6 +165,7 @@ export function App() {
           </footer>
         )}
       </section>
+      <HoroscopeCard />
       <footer className="info">
         <p>Double-click to edit a task</p>
         <p>Overdo: a to-do list that does far too much</p>
