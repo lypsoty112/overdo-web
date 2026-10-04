@@ -4,14 +4,17 @@
 // only on blur: Enter blurs, Escape restores the old title and then blurs, and an emptied title deletes
 // the task, as the TodoMVC spec asks. describeDue turns a due date into "due tomorrow" or "3 days
 // overdue", counted from the viewer's local date rather than UTC so "today" flips at their midnight.
-import { useState } from "react";
+// The selected row answers x (toggle), e (edit) and Delete, and scrolls itself into view.
+import { useEffect, useRef, useState } from "react";
 import type { TaskPatch } from "../api";
 import type { Task } from "../types";
+import { useShortcuts } from "../useShortcuts";
 import { BossBar } from "./BossBar";
 import { ENERGY_ICONS, TaskDetails } from "./TaskDetails";
 
 interface Props {
   task: Task;
+  selected: boolean;
   onUpdate: (patch: TaskPatch) => void;
   onDelete: () => void;
   onChanged: () => void;
@@ -71,11 +74,19 @@ export function TaskMeta({ task }: { task: Task }) {
   );
 }
 
-export function TaskItem({ task, onUpdate, onDelete, onChanged, onStartFocus }: Props) {
+export function TaskItem({ task, selected, onUpdate, onDelete, onChanged, onStartFocus }: Props) {
   const [editing, setEditing] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const row = useRef<HTMLLIElement>(null);
   const done = task.status === "done";
-  const classes = [done && "completed", editing && "editing", expanded && "expanded"].filter(Boolean);
+  const classes = [done && "completed", editing && "editing", expanded && "expanded", selected && "selected"];
+  const toggle = () => onUpdate({ status: done ? "todo" : "done" });
+
+  useShortcuts({ x: toggle, e: () => setEditing(true), Delete: onDelete }, selected && !editing);
+
+  useEffect(() => {
+    if (selected) row.current?.scrollIntoView({ block: "nearest" });
+  }, [selected]);
 
   const save = (value: string) => {
     setEditing(false);
@@ -85,14 +96,9 @@ export function TaskItem({ task, onUpdate, onDelete, onChanged, onStartFocus }: 
   };
 
   return (
-    <li className={classes.join(" ")}>
+    <li ref={row} className={classes.filter(Boolean).join(" ")}>
       <div className="view">
-        <input
-          className="toggle"
-          type="checkbox"
-          checked={done}
-          onChange={() => onUpdate({ status: done ? "todo" : "done" })}
-        />
+        <input className="toggle" type="checkbox" checked={done} onChange={toggle} />
         {/* biome-ignore lint/a11y/noLabelWithoutControl: TodoMVC's CSS styles this label; binding it to the checkbox would toggle the task on every double-click to edit. */}
         <label onDoubleClick={() => setEditing(true)}>
           {task.title}

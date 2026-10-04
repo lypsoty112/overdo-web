@@ -5,20 +5,23 @@
 // stats, and completing a task fires confetti, announces a fallen boss, and asks how it felt. The tab
 // title counts what is left, and an empty list (once loaded, so it never flashes) offers starter tasks.
 // Deletes leave the list at once but reach the API only when their undo toast expires; a second delete
-// sends the first one immediately rather than stacking toasts.
+// sends the first one immediately rather than stacking toasts. Keyboard: n focuses the new-task box,
+// j/k move the selection through the visible rows, ? toggles the cheat sheet and Esc clears both.
 import confetti from "canvas-confetti";
-import { type FormEvent, useCallback, useEffect, useState } from "react";
+import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import * as api from "./api";
 import { Board } from "./components/Board";
 import { HoroscopeCard } from "./components/HoroscopeCard";
 import { MoodPrompt } from "./components/MoodPrompt";
 import { PomodoroWidget } from "./components/PomodoroWidget";
+import { ShortcutHelp } from "./components/ShortcutHelp";
 import { StatsBar } from "./components/StatsBar";
 import { TaskItem } from "./components/TaskItem";
 import { UndoToast } from "./components/UndoToast";
 import { VictoryBanner } from "./components/VictoryBanner";
 import type { Boss, Pomodoro, Stats, Task } from "./types";
 import { type Filter, useHashFilter } from "./useHashFilter";
+import { useShortcuts } from "./useShortcuts";
 
 const FILTERS: { filter: Filter; href: string; label: string }[] = [
   { filter: "all", href: "#/", label: "All" },
@@ -38,6 +41,9 @@ export function App() {
   const [moodFor, setMoodFor] = useState<Task | null>(null);
   const [fallenBoss, setFallenBoss] = useState<Boss | null>(null);
   const [pendingDelete, setPendingDelete] = useState<Task[] | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const newTaskInput = useRef<HTMLInputElement>(null);
   const filter = useHashFilter();
 
   const reload = useCallback(
@@ -126,13 +132,30 @@ export function App() {
 
   const completed = tasks.filter((task) => task.status === "done");
   const remaining = tasks.length - completed.length;
+  const visible = tasks.filter(
+    (task) => filter === "all" || (filter === "completed") === (task.status === "done"),
+  );
 
   useEffect(() => {
     document.title = remaining > 0 ? `(${remaining}) Overdo` : "Overdo";
   }, [remaining]);
-  const visible = tasks.filter(
-    (task) => filter === "all" || (filter === "completed") === (task.status === "done"),
-  );
+
+  const moveSelection = (step: number) => {
+    const index = visible.findIndex((task) => task.id === selectedId);
+    const next = index === -1 ? 0 : Math.min(visible.length - 1, Math.max(0, index + step));
+    setSelectedId(visible[next]?.id ?? null);
+  };
+
+  useShortcuts({
+    n: () => newTaskInput.current?.focus(),
+    j: () => moveSelection(1),
+    k: () => moveSelection(-1),
+    "?": () => setShowShortcuts((open) => !open),
+    Escape: () => {
+      setShowShortcuts(false);
+      setSelectedId(null);
+    },
+  });
 
   const toggleAll = () => {
     const status = remaining > 0 ? "done" : "todo";
@@ -151,6 +174,7 @@ export function App() {
           <h1>overdo</h1>
           <form onSubmit={add}>
             <input
+              ref={newTaskInput}
               className="new-todo"
               placeholder="What needs to be overdone?"
               value={draft}
@@ -189,6 +213,7 @@ export function App() {
                 <TaskItem
                   key={task.id}
                   task={task}
+                  selected={task.id === selectedId}
                   onUpdate={(patch) => update(task.id, patch)}
                   onDelete={() => remove([task])}
                   onChanged={reload}
@@ -222,7 +247,7 @@ export function App() {
       </section>
       <HoroscopeCard />
       <footer className="info">
-        <p>Double-click to edit a task</p>
+        <p>Double-click to edit a task · Press ? for keyboard shortcuts</p>
         <p>Overdo: a to-do list that does far too much</p>
       </footer>
       {pomodoro && (
@@ -233,6 +258,7 @@ export function App() {
         />
       )}
       {pendingDelete && <UndoToast tasks={pendingDelete} onUndo={undoDelete} onExpire={commitDelete} />}
+      {showShortcuts && <ShortcutHelp onClose={() => setShowShortcuts(false)} />}
       {moodFor && (
         <MoodPrompt
           task={moodFor}

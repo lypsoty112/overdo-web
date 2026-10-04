@@ -21,6 +21,8 @@ The dev server proxies `/api` to `overdo-api` on `http://localhost:3700`, so sta
   tomorrow", "3 days overdue" in red), subtask progress and tags.
 - The tab title counts open tasks, and an empty list offers a few starter tasks.
 - Deleting (or clearing completed) can be undone for five seconds before it reaches the API.
+- Keyboard shortcuts: `n` new task, `j`/`k` select, `x` complete, `e` edit, `Delete` remove, `?` for
+  the full list.
 - ▾ unfolds a details panel: priority, energy and due date pickers, notes, tag chips with
   autocomplete, and a subtask checklist.
 - A stats bar pinned to the top: level and XP, streak, today's completions and focus minutes, mood of
